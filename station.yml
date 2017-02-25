@@ -1,5 +1,10 @@
 - hosts: pi1
   remote_user: pi
   roles:
-    - base
+#    - base
     - instrumentation
+  vars:
+    datadog_api_key: dd_api_key
+    datadog_config:
+      tags: "{{ inventory_hostname }}"
+      log_level: INFO

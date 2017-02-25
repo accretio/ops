@@ -1,5 +1,23 @@
 # deploy instrumentation prerequisites
 
-- name: Install the datadog library
-  pip:
-    name: datadog
+# - name: Install the datadog library
+#   pip:
+#     name: datadog
+
+# - name: Install some deps
+#   apt:
+#     name: sysstat
+#     state: present
+
+- name: Copy the install script
+  become: false
+  template:
+    src: setup_agent.sh
+    dest: /tmp/setup_agent.sh
+    mode: u+rwx
+
+- name: Install the datadog agent
+  become: false
+  environment:
+    DD_API_KEY: "{{ dd_api_key }}"
+  shell: /tmp/setup_agent.sh
