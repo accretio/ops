@@ -1,0 +1,11 @@
+# Install the python environment
+
+- name: Install python
+  apt:
+    name: python
+    state: present
+
+- name: Install python-pip
+  apt:
+    name: python-pip
+    state: present 

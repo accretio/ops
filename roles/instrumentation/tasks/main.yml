@@ -1,0 +1,5 @@
+# deploy instrumentation prerequisites
+
+- name: Install the datadog library
+  pip:
+    name: datadog

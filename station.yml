@@ -1,0 +1,5 @@
+- hosts: pi1
+  remote_user: pi
+  roles:
+    - base
+    - instrumentation
