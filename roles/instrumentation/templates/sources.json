@@ -1,0 +1,37 @@
+{
+  "api.version": "v1",
+  "sources": [
+    
+    {
+      "sourceType":"LocalFile",
+      "name":"Octoprint",
+      "pathExpression":"/home/pi/.octoprint/logs/*.log"
+    },
+    
+    {
+      "sourceType":"LocalFile",
+      "name":"Syslog",
+      "pathExpression":"/var/log/syslog"
+    },
+    
+    {
+      "sourceType":"LocalFile",
+      "name":"HAProxy",
+      "pathExpression":"/var/log/haproxy.log"
+    },
+    
+    {
+      "sourceType":"LocalFile",
+      "name":"Auth",
+      "pathExpression":"/var/log/auth.log"
+    },
+
+    {
+      "sourceType":"LocalFile",
+      "name":"Collector",
+      "pathExpression":"/opt/sumologic/sumocollector/logs/collector.out.log"
+    }
+    
+  ]
+  
+}

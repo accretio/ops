@@ -1,24 +1,103 @@
-# deploy instrumentation prerequisites
+# deploy the datadog client python library inside oprint's venv
 
-- name: Install the datadog library
-  pip:
-    name: datadog
-    virtualenv: /home/pi/oprint
+# - name: Install the datadog library
+#   pip:
+#     name: datadog
+#     virtualenv: /home/pi/oprint
+
+# # deploy the datadog collector
 
 # - name: Install some deps
 #   apt:
 #     name: sysstat
 #     state: present
+#     update_cache: yes
 
-- name: Copy the install script
-  become: false
-  template:
-    src: setup_agent.sh
-    dest: /tmp/setup_agent.sh
-    mode: u+rwx
+# - name: Copy the install script
+#   become: false
+#   template:
+#     src: setup_agent.sh
+#     dest: /tmp/setup_agent.sh
+#     mode: u+rwx
 
 # - name: Install the datadog agent
 #   become: false
 #   environment:
 #     DD_API_KEY: "{{ dd_api_key }}"
 #   shell: /tmp/setup_agent.sh
+
+# deploy the sumologic collector
+
+# - name: Install Java 7
+#   apt:
+#     name: openjdk-7-jre
+#     state: present
+#     update_cache: yes
+
+- name: Create a sumologic directory
+  file:
+    path: /opt/sumologic
+    state: directory
+    mode: 0755
+    
+- name: Download the unix installer
+  unarchive:
+    src: https://collectors.sumologic.com/rest/download/tar
+    dest: /opt/sumologic
+    remote_src: True
+
+- name: Download the wrapper
+  unarchive:
+    src: http://wrapper.tanukisoftware.com/download/3.5.16/wrapper-linux-arm-32-3.5.16-st.tar.gz?mode=download
+    dest: /opt/sumologic
+    remote_src: True
+
+- name: Copy the wrapper lib to the right location
+  copy:
+    remote_src: True
+    src: /opt/sumologic/wrapper-linux-arm-32-3.5.16-st/lib/libwrapper.so
+    dest:  /opt/sumologic/sumocollector/19.182-17/bin/native/lib/
+
+
+- name: Copy the wrapper to the right location
+  copy:
+    remote_src: True
+    src: /opt/sumologic/wrapper-linux-arm-32-3.5.16-st/bin/wrapper
+    dest:  /opt/sumologic/sumocollector/
+
+    
+    # wrapper-linux-arm-32-3.5.16-st/lib/libwrapper.so sumocollector/19.182-17/bin/native/lib/
+
+    # sudo cp wrapper-linux-arm-32-3.5.16-st/bin/wrapper sumocollector/
+
+    # chmod ug+w wrapper
+# chmod ug+w collector
+
+- name: Update the permissions
+  file:
+    path: /opt/sumologic/sumocollector/wrapper
+    state: touch
+    mode: "ug+w"
+
+- name: Update the permissions
+  file:
+    path: /opt/sumologic/sumocollector/collector
+    state: touch
+    mode: "ug+x"
+
+- name: Inject the configuration
+  template:
+    src: user.properties
+    dest: /opt/sumologic/sumocollector/config
+
+- name: Configure the sources
+  template:
+    src: sources.json
+    dest: /etc/sources.json
+
+- name: Start the collector
+  command:  /opt/sumologic/sumocollector/collector restart
+  
+
+# sed -i 's:${JAVA_COMMAND_LOCATION}:/usr/bin/java:' config/wrapper.conf
+
